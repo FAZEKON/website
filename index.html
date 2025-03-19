@@ -56,8 +56,10 @@
         let bluetoothDevice;
         let uartCharacteristic;
 
+        // Function to connect to the Bluetooth device
         async function connectBluetooth() {
             try {
+                // Request Bluetooth device
                 bluetoothDevice = await navigator.bluetooth.requestDevice({
                     acceptAllDevices: true,
                     optionalServices: [0xffe0] // Generic UART service
@@ -75,15 +77,17 @@
             }
         }
 
+        // Function to send commands to the RC car
         async function sendCommand(command) {
             if (!uartCharacteristic) {
                 alert("Bluetooth not connected!");
                 return;
             }
-            let data = new TextEncoder().encode(command + "\n");
+            const data = new TextEncoder().encode(command + "\n");
             await uartCharacteristic.writeValue(data);
         }
 
+        // Create and configure the joystick
         const joystick = nipplejs.create({
             zone: document.getElementById('joystick-container'),
             mode: 'static',
@@ -93,6 +97,7 @@
             threshold: 0.3
         });
 
+        // When the joystick is moved, send the appropriate command
         joystick.on('move', function(evt, data) {
             if (data.direction) {
                 const direction = data.direction.angle;
@@ -108,6 +113,7 @@
             }
         });
 
+        // When the joystick is released, stop the car
         joystick.on('end', function() {
             sendCommand('x'); // Stop
         });
