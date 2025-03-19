@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Bluetooth RC Car Controller</title>
+    <style>
+        body { text-align: center; font-family: Arial, sans-serif; }
+        .btn { font-size: 20px; padding: 15px; margin: 5px; width: 100px; }
+    </style>
+</head>
+<body>
+    <h2>RC Car Bluetooth Controller</h2>
+    <button class="btn" onclick="sendCommand('w')">Forward</button><br>
+    <button class="btn" onclick="sendCommand('a')">Left</button>
+    <button class="btn" onclick="sendCommand('x')">Stop</button>
+    <button class="btn" onclick="sendCommand('d')">Right</button><br>
+    <button class="btn" onclick="sendCommand('s')">Backward</button>
+    <br><br>
+    <button class="btn" onclick="connectBluetooth()">Connect</button>
+    <p id="status">Not Connected</p>
+    
+    <script>
+        let bluetoothDevice;
+        let uartCharacteristic;
+
+        async function connectBluetooth() {
+            try {
+                bluetoothDevice = await navigator.bluetooth.requestDevice({
+                    acceptAllDevices: true,
+                    optionalServices: [0xffe0] // Generic UART service
+                });
+                
+                const server = await bluetoothDevice.gatt.connect();
+                const service = await server.getPrimaryService(0xffe0);
+                uartCharacteristic = await service.getCharacteristic(0xffe1);
+                
+                document.getElementById("status").innerText = "Connected!";
+            } catch (error) {
+                console.error("Bluetooth connection failed:", error);
+                document.getElementById("status").innerText = "Connection Failed";
+            }
+        }
+
+        async function sendCommand(command) {
+            if (!uartCharacteristic) {
+                alert("Bluetooth not connected!");
+                return;
+            }
+            let data = new TextEncoder().encode(command + "\n");
+            await uartCharacteristic.writeValue(data);
+        }
+    </script>
+</body>
+</html>
