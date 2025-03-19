@@ -13,9 +13,14 @@
     <button class="btn" onclick="sendCommand('a')">Left</button>
     <button class="btn" onclick="sendCommand('x')">Stop</button>
     <button class="btn" onclick="sendCommand('d')">Right</button><br>
-    <button class="btn" onclick="sendCommand('s')">Backward</button>
-    <br><br>
+    <button class="btn" onclick="sendCommand('s')">Backward</button><br><br>
+    
+    <button class="btn" onclick="sendCommand('h')">Headlights</button><br>
+    <button class="btn" onclick="sendCommand('l')">Left Turn Signal</button>
+    <button class="btn" onclick="sendCommand('r')">Right Turn Signal</button><br><br>
+    
     <button class="btn" onclick="connectBluetooth()">Connect</button>
+    <button class="btn" onclick="disconnectBluetooth()">Disconnect</button>
     <p id="status">Not Connected</p>
     
     <script>
@@ -37,6 +42,15 @@
             } catch (error) {
                 console.error("Bluetooth connection failed:", error);
                 document.getElementById("status").innerText = "Connection Failed";
+            }
+        }
+
+        function disconnectBluetooth() {
+            if (bluetoothDevice) {
+                bluetoothDevice.gatt.disconnect();
+                document.getElementById("status").innerText = "Disconnected!";
+            } else {
+                alert("No device to disconnect.");
             }
         }
 
